@@ -1,0 +1,29 @@
+{
+  "name": "@gabeklein/rest-resource",
+  "version": "0.0.0",
+  "description": "Simple functions to test and print REST responses.",
+  "main": "lib/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "types": "index.d.ts",
+  "files": [
+    "lib/",
+    "index.d.ts"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "postversion": "npm publish",
+    "postpublish": "git push; git push --tags"
+  },
+  "author": "Gabe <gabe@termtm.com>",
+  "repository": "git@github.com:gabeklein/rest-resource.git",
+  "devDependencies": {
+    "@types/express": "^4.17.1",
+    "@types/node": "^12.11.1",
+    "typescript": "^3.6.4"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
