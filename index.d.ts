@@ -71,4 +71,5 @@ export function DELETE<T extends Object = any, O = any>
 export const USE: ApplicationRequestHandler<Express>; 
 
 export { API, API as server, API as default }
+export { json, urlencoded } from "express";
 export * from "./helpers"

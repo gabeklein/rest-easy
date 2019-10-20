@@ -4,6 +4,7 @@ import { abstract } from './abstract';
 import { server } from './server';
 
 export { server, server as API, server as default };
+export { json, urlencoded } from "express";
 export * from "./errors";
 export * from "./gates";
 
