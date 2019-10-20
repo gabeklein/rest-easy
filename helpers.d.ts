@@ -1,3 +1,5 @@
+import { RequestHandler } from "express";
+
 declare interface RestError {
   code: number;
   message: string;
@@ -18,3 +20,21 @@ export function BadInput(message?: string, error?: string): RestError;
 
 /** Throw this to send any http status with `message` to client. */
 export function Code(status: number, message?: string, error?: string): RestError;
+
+/**
+ * Add headers to enable CORS for any (or specified) origin.
+ * 
+ * @param allow - Allowed origin, default `*`. 
+ * 
+ * `e.g. "https://mywebsite.com"`
+ */
+export function origin(allow?: string): RequestHandler;
+
+/**
+ * Expect Authorization header, if not present bail and return `401`.
+ * 
+ * @param expect - Expected Authorization value.
+ * 
+ * `e.g. "basic SECRET"`
+ */
+export function authorize(expect: string): RequestHandler;

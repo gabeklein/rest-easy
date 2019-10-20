@@ -4,7 +4,8 @@ import { abstract } from './abstract';
 import { server } from './server';
 
 export { server, server as API, server as default };
-export { BadInput, Forbid, Internal, NotFound, Code } from "./errors";
+export * from "./errors";
+export * from "./gates";
 
 type Verb = "get" | "post" | "put" | "delete" | "patch";
 

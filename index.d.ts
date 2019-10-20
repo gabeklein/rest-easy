@@ -21,6 +21,8 @@ type HandleBody<I, O = void> = (
   res: express.Response
 ) => O | Promise<O>;
 
+declare const API: Express;
+
 /**
  * Register a GET request with your exported App.
  * 
@@ -68,6 +70,5 @@ export function DELETE<T extends Object = any, O = any>
 
 export const USE: ApplicationRequestHandler<Express>; 
 
-declare const API: Express;
 export { API, API as server, API as default }
-export * from "./errors"
+export * from "./helpers"
