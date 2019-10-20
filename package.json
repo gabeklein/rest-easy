@@ -1,7 +1,7 @@
 {
   "name": "@gabeklein/rest-resource",
-  "version": "1.0.0-0",
-  "description": "Simple functions to test and print REST responses.",
+  "version": "1.0.0",
+  "description": "Simple functions to easily define a REST app with express.",
   "main": "lib/index.js",
   "publishConfig": {
     "access": "public"
@@ -14,7 +14,8 @@
   "scripts": {
     "build": "tsc",
     "postversion": "npm publish",
-    "postpublish": "git push; git push --tags"
+    "version": "npm run build",
+    "postpublish": "git push; git push --tags; rm -rf lib"
   },
   "author": "Gabe <gabe@termtm.com>",
   "repository": "git@github.com:gabeklein/rest-resource.git",
