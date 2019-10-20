@@ -27,46 +27,57 @@ declare const API: Express;
  * Register a GET request with your exported App.
  * 
  * @param loc - Resource url
- * @param fn - Handler body
+ * @param m - Middleware (any Express RequestHandler)
+ * @param fn - Handler
  */
-export function GET<T extends Object = any, O = any>
-  (loc: string, fn: Handle<T, O>): void;
+export function GET <T={}, O=any> (loc: string, fn: Handle<T, O>): void
+export function GET <T={}, O=any> (loc: string, m1: RequestHandler, fn: Handle<T, O>): void
+export function GET <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, fn: Handle<T, O>): void
+export function GET <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, m3: RequestHandler, fn: Handle<T, O>): void
 
 /**
  * Register a POST request with your exported App.
  * 
  * @param loc - Resource url
- * @param fn - Handler body
+ * @param m - Middleware (any Express RequestHandler)
+ * @param fn - Handler
  */
-export function POST<T extends Object = any, O = any>
-  (loc: string, fn: HandleBody<T, O>): void;
+export function POST <T={}, O=any> (loc: string, fn: HandleBody<T, O>): void
+export function POST <T={}, O=any> (loc: string, m1: RequestHandler, fn: HandleBody<T, O>): void
+export function POST <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, fn: HandleBody<T, O>): void
+export function POST <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, m3: RequestHandler, fn: HandleBody<T, O>): void
 
 /**
  * Register a PUT request with your exported App.
  * 
  * @param loc - Resource url
- * @param fn - Handler body
+ * @param m - Middleware (any Express RequestHandler)
+ * @param fn - Handler
  */
-export function PUT<T extends Object = any, O = any>
-  (loc: string, fn: HandleBody<T, O>): void;
+export function PUT <T={}, O=any> (loc: string, fn: HandleBody<T, O>): void
+export function PUT <T={}, O=any> (loc: string, m1: RequestHandler, fn: HandleBody<T, O>): void
+export function PUT <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, fn: HandleBody<T, O>): void
+export function PUT <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, m3: RequestHandler, fn: HandleBody<T, O>): void
 
 /**
  * Register a PATCH request with your exported App.
  * 
  * @param loc - Resource url
- * @param fn - Handler body
+ * @param m - Middleware (any Express RequestHandler)
+ * @param fn - Handler
  */
-export function PATCH<T extends Object = any, O = any>
-  (loc: string, fn: HandleBody<T, O>): void;
+export function PATCH <T={}, O=any> (loc: string, fn: HandleBody<T, O>): void
+export function PATCH <T={}, O=any> (loc: string, m1: RequestHandler, fn: HandleBody<T, O>): void
+export function PATCH <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, fn: HandleBody<T, O>): void
+export function PATCH <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, m3: RequestHandler, fn: HandleBody<T, O>): void
 
 /**
  * Register a DELETE request with your exported App.
  * 
  * @param loc - Resource url
- * @param fn - Handler body
+ * @param fn - Request Handlers
  */
-export function DELETE<T extends Object = any, O = any>
-  (loc: string, fn: Handle<T, O>): void;
+export function DELETE (loc: string, ...fn: RequestHandler[]): void;
 
 export const USE: ApplicationRequestHandler<Express>; 
 
