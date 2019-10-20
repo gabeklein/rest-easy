@@ -1,6 +1,6 @@
 {
   "name": "@gabeklein/rest-resource",
-  "version": "0.0.0",
+  "version": "1.0.0-0",
   "description": "Simple functions to test and print REST responses.",
   "main": "lib/index.js",
   "publishConfig": {
