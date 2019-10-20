@@ -68,5 +68,5 @@ export function DELETE<T extends Object = any, O = any>
 
 export const USE: ApplicationRequestHandler<Express>; 
 
-declare const server: Express;
-export { server, server as default }
+declare const API: Express;
+export { API, API as server, API as default }

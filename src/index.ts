@@ -3,7 +3,7 @@ import { RequestHandler } from 'express';
 import { abstract } from './abstract';
 import { server } from './server';
 
-export { server, server as default };
+export { server, server as API, server as default };
 export { BadInput, Forbid, Internal, NotFound, Code } from "./errors";
 
 type Verb = "get" | "post" | "put" | "delete" | "patch";
