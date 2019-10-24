@@ -1,5 +1,5 @@
 {
-  "name": "@gabeklein/rest-easy",
+  "name": "rest-easy",
   "version": "1.4.0",
   "description": "Simple functions to easily define a REST app with express.",
   "main": "lib/index.js",
