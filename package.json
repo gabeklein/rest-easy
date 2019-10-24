@@ -1,6 +1,6 @@
 {
   "name": "rest-easy",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Simple functions to easily define a REST app with express.",
   "main": "lib/index.js",
   "publishConfig": {
