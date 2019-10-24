@@ -1,12 +1,12 @@
-import { RequestHandler } from 'express';
+import express, { Express, RequestHandler } from 'express';
 
 import { abstract } from './abstract';
-import { server } from './server';
 
-export { server, server as API, server as default };
-export { json, urlencoded } from "express";
-export * from "./errors";
-export * from "./gates";
+let server: Express;
+
+function setNewDefaultInstance(instance?: Express){
+  server = instance || express();
+}
 
 type Verb = "get" | "post" | "put" | "delete" | "patch";
 
@@ -19,9 +19,17 @@ const resource = (verb: Verb) =>
     server[verb](loc, ...handlers)
   }
 
+setNewDefaultInstance();
+
 export const GET = resource("get");
 export const POST = resource("post");
 export const PUT = resource("put");
 export const PATCH = resource("patch");
 export const DELETE = resource("delete");
-export const USE = server.use.bind(server);
+export const USE = (...args: RequestHandler[]) => server.use(...args);
+
+export { setNewDefaultInstance as setDefault }
+export { server as default, server as API, server };
+export { json, urlencoded } from "express";
+export * from "./errors";
+export * from "./gates";
