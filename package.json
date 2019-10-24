@@ -12,6 +12,7 @@
     "*.d.ts"
   ],
   "scripts": {
+    "preversion": "rm -rf lib",
     "build": "tsc",
     "postversion": "npm publish",
     "version": "npm run build",
