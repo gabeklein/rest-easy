@@ -52,3 +52,8 @@ export function abstract(handler: RequestHandler): RequestHandler {
     }
   }
 }
+
+export const handle404: RequestHandler = 
+  (q, r) => r.status(404).json({
+    message: `Cannot ${q.method} ${q.url}`
+  })

@@ -1,11 +1,20 @@
 import express, { Express, RequestHandler } from 'express';
 
-import { abstract } from './abstract';
+import { abstract, handle404 } from './abstract';
 
 let server: Express;
+let exportedDefault = {
+  listen: finalizeThenListen
+};
+
+function finalizeThenListen(...args: any){
+  server.use(handle404);
+  server.listen(...args);
+}
 
 function setNewDefaultInstance(instance?: Express){
   server = instance || express();
+  Object.setPrototypeOf(exportedDefault, server);
 }
 
 type Verb = "get" | "post" | "put" | "delete" | "patch";
@@ -29,7 +38,7 @@ export const DELETE = resource("delete");
 export const USE = (...args: RequestHandler[]) => server.use(...args);
 
 export { setNewDefaultInstance as setDefault }
-export { server as default, server as API, server };
+export { exportedDefault as default, exportedDefault as API, exportedDefault };
 export { json, urlencoded } from "express";
 export * from "./errors";
 export * from "./gates";
