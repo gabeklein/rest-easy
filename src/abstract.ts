@@ -8,28 +8,13 @@ export function abstract(handler: RequestHandler): RequestHandler {
   return async (request, response, next) => {
     try {
       const exec = handler(request as any, response, next) as any;
-      let output = exec instanceof Promise
-        ? await exec : exec;
+      let output = exec instanceof Promise ? await exec : exec;
 
-      if(output && typeof output !== "string")
-        try {
-          response.send(
-            JSON.stringify(output)
-          )
-        }
-        catch(err){
-          throw SerializeError;
-        }
-
-      else {
-        const expectsJSON = 
-          request.headers["content-type"] === "application/json"
-
-        response.send(
-          expectsJSON
-            ? { response: output || "ok" }
-            : output || ""
-        )
+      try { 
+        respond(200, output);
+      }
+      catch(err){
+        throw SerializeError;
       }
     }
     catch(err){
@@ -37,18 +22,29 @@ export function abstract(handler: RequestHandler): RequestHandler {
         err = err();
 
       if(err instanceof RestError)
-        response.status(err.statusCode).json({
-          code: err.statusCode,
+        respond(500, {
+          statusCode: err.statusCode,
           error: err.shortCode,
           message: err.message
         });
 
       else {
         console.error(err);
-        response.status(500).send({
-          ok: false
-        });
+        respond(500, {});
       }
+    }
+
+    function respond(status: number, content: any){
+      if(response.headersSent)
+        return
+
+      if(content === undefined)
+        content = { ok: true };
+      else if(typeof content !== "object")
+        content = { response: content };
+      
+      content.statusCode = status;
+      response.status(status).json(content)
     }
   }
 }
