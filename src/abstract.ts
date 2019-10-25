@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 
-import { Internal } from './errors';
+import { Internal, RestError } from './errors';
 
 const SerializeError = Internal("Resource returned data which could not be serialized")
 
@@ -36,8 +36,12 @@ export function abstract(handler: RequestHandler): RequestHandler {
       if(typeof err == "function")
         err = err();
 
-      if(typeof err == "object" && err.code)
-        response.status(err.code).send(err)
+      if(err instanceof RestError)
+        response.status(err.statusCode).json({
+          code: err.statusCode,
+          error: err.shortCode,
+          message: err.message
+        });
 
       else {
         console.error(err);
