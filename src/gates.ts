@@ -19,6 +19,7 @@ export function authorize(expect: string): RequestHandler {
         next()
       else
         r.status(401).send({
+          statusCode: 401,
           message: "Requires Authorization",
           error: "need_auth"
         });

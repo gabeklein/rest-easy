@@ -2,7 +2,7 @@ import { RequestHandler } from 'express';
 
 import { Internal, RestError } from './errors';
 
-const SerializeError = Internal("Resource returned data which could not be serialized")
+const SerializeError = Internal("Resource returned data which could not be serialized", "serialize_error")
 
 export function abstract(handler: RequestHandler): RequestHandler {
   return async (request, response, next) => {
