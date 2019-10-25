@@ -22,8 +22,7 @@ export function abstract(handler: RequestHandler): RequestHandler {
         err = err();
 
       if(err instanceof RestError)
-        respond(500, {
-          statusCode: err.statusCode,
+        respond(err.statusCode, {
           error: err.shortCode,
           message: err.message
         });
@@ -43,7 +42,6 @@ export function abstract(handler: RequestHandler): RequestHandler {
       else if(typeof content !== "object")
         content = { response: content };
       
-      content.statusCode = status;
       response.status(status).json(content)
     }
   }
