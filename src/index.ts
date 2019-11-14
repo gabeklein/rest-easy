@@ -21,11 +21,10 @@ type Verb = "get" | "post" | "put" | "delete" | "patch";
 
 const resource = (verb: Verb) => 
   (loc: string, ...handlers: RequestHandler[]) => {
-    const handle = handlers.pop();
-    if(!handle)
+    const main = handlers.pop();
+    if(!main)
       throw new Error(`Endpoint ${loc} has no supplied handler!`);
-    handlers.push(abstract(handle));
-    server[verb](loc, ...handlers)
+    server[verb](loc, ...handlers, abstract(main))
   }
 
 setNewDefaultInstance();
