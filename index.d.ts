@@ -34,6 +34,9 @@ export function GET <T={}, O=any> (loc: string, fn: Handle<T, O>): void
 export function GET <T={}, O=any> (loc: string, m1: RequestHandler, fn: Handle<T, O>): void
 export function GET <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, fn: Handle<T, O>): void
 export function GET <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, m3: RequestHandler, fn: Handle<T, O>): void
+export namespace GET {
+  function test(dir: string, query?: {}, headers?: {}): void;
+}
 
 /**
  * Register a POST request with your exported App.
@@ -46,6 +49,9 @@ export function POST <T={}, O=any> (loc: string, fn: HandleBody<T, O>): void
 export function POST <T={}, O=any> (loc: string, m1: RequestHandler, fn: HandleBody<T, O>): void
 export function POST <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, fn: HandleBody<T, O>): void
 export function POST <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, m3: RequestHandler, fn: HandleBody<T, O>): void
+export namespace POST {
+  function test(dir: string, body?: {}, headers?: {}): void;
+}
 
 /**
  * Register a PUT request with your exported App.
@@ -58,6 +64,9 @@ export function PUT <T={}, O=any> (loc: string, fn: HandleBody<T, O>): void
 export function PUT <T={}, O=any> (loc: string, m1: RequestHandler, fn: HandleBody<T, O>): void
 export function PUT <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, fn: HandleBody<T, O>): void
 export function PUT <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, m3: RequestHandler, fn: HandleBody<T, O>): void
+export namespace PUT {
+  function test(dir: string, body?: {}, headers?: {}): void;
+}
 
 /**
  * Register a PATCH request with your exported App.
@@ -70,6 +79,9 @@ export function PATCH <T={}, O=any> (loc: string, fn: HandleBody<T, O>): void
 export function PATCH <T={}, O=any> (loc: string, m1: RequestHandler, fn: HandleBody<T, O>): void
 export function PATCH <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, fn: HandleBody<T, O>): void
 export function PATCH <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, m3: RequestHandler, fn: HandleBody<T, O>): void
+export namespace PATCH {
+  function test(dir: string, body?: {}, headers?: {}): void;
+}
 
 /**
  * Register a DELETE request with your exported App.
@@ -78,6 +90,9 @@ export function PATCH <T={}, O=any> (loc: string, m1: RequestHandler, m2: Reques
  * @param fn - Request Handlers
  */
 export function DELETE (loc: string, ...fn: RequestHandler[]): void;
+export namespace DELETE {
+  function test(dir: string, body?: {}, headers?: {}): void;
+}
 
 export const USE: ApplicationRequestHandler<Express>; 
 

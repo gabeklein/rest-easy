@@ -1,15 +1,24 @@
 import express, { Express, RequestHandler } from 'express';
 
 import { abstract, handle404 } from './abstract';
+import { testHandler, declareHost } from './test';
+
+type Verb = "get" | "post" | "put" | "delete" | "patch";
 
 let server: Express;
 let exportedDefault = {
   listen: finalizeThenListen
 };
 
-function finalizeThenListen(...args: any){
+function finalizeThenListen(head: any, ...args: any){
   server.use(handle404);
-  server.listen(...args);
+  server.listen(head, ...args);
+
+  if(typeof head === "number"){
+    declareHost(`http://localhost:${head}`);
+    console.log(`Listening on port ${head}`)
+  }
+
 }
 
 function setNewDefaultInstance(instance?: Express){
@@ -17,15 +26,20 @@ function setNewDefaultInstance(instance?: Express){
   Object.setPrototypeOf(exportedDefault, server);
 }
 
-type Verb = "get" | "post" | "put" | "delete" | "patch";
+const resource = (verb: Verb) => {
+  function register(
+    loc: string, ...handlers: RequestHandler[]){
 
-const resource = (verb: Verb) => 
-  (loc: string, ...handlers: RequestHandler[]) => {
     const main = handlers.pop();
     if(!main)
       throw new Error(`Endpoint ${loc} has no supplied handler!`);
     server[verb](loc, ...handlers, abstract(main))
   }
+
+  register.test = testHandler(verb);
+  
+  return register;
+}
 
 setNewDefaultInstance();
 
@@ -39,5 +53,6 @@ export const USE = (...args: RequestHandler[]) => server.use(...args);
 export { setNewDefaultInstance as setDefault }
 export { exportedDefault as default, exportedDefault as API, exportedDefault };
 export { json, urlencoded } from "express";
+export { print } from "./print"
 export * from "./errors";
 export * from "./gates";
