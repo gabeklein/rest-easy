@@ -56,14 +56,15 @@ function definitionHandler(loc: string, verb: Verb){
 
 const atModule = /\s+at.+\((.+):\d+:\d/;
 const cwd = process.cwd();
-const isInCWD = (d: string) => d.indexOf(cwd) >= 0;
+const isInWorkingDirectory = 
+  (d: string) => d.indexOf("node_modules") < 0 && d.indexOf(cwd) >= 0;
 
 function getNamespace(): string | void;
 function getNamespace(setPrefix: string): void; 
 function getNamespace(setPrefix?: string): string | void {
   const stackAlaCarte = new Error();
   try {
-    const at = stackAlaCarte.stack!.split("\n").slice(2).find(isInCWD) as any;
+    const at = stackAlaCarte.stack!.split("\n").slice(2).find(isInWorkingDirectory) as any;
     const file = atModule.exec(at)![1];
     const ns = currentNamespace;
     
