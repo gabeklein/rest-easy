@@ -1,3 +1,4 @@
+import { join } from "path";
 import express, { Express, RequestHandler } from 'express';
 
 import { abstract, handle404 } from './abstract';
@@ -25,16 +26,54 @@ function setNewDefaultInstance(instance?: Express){
   Object.setPrototypeOf(exportedDefault, server);
 }
 
+const routeStack = [] as string[];
+let currentNamespace = {} as {
+  module: string;
+  prefix: string;
+};
+
 function definitionHandler(loc: string, verb: Verb){
+  const namespace = getNamespace() || "";
+  const path = join(namespace, ...routeStack, loc);
+  
   return (...handlers: RequestHandler[]) => {
     const main = handlers.pop();
     if(!main)
-      throw new Error(`Endpoint ${loc} has no supplied handler!`);
-    server[verb](loc, ...handlers, abstract(main))
+      throw new Error(`Resource ${path} has no supplied handler!`);
+    server[verb](path, ...handlers, abstract(main))
   }
 }
 
-const resource = (verb: Verb) => {
+const atModule = /\s+at.+\((.+):\d+:\d/;
+const cwd = process.cwd();
+const isInCWD = (d: string) => d.indexOf(cwd) >= 0;
+
+function getNamespace(): string | void;
+function getNamespace(setPrefix: string): void; 
+function getNamespace(setPrefix?: string): string | void {
+  const stackAlaCarte = new Error();
+  try {
+    const at = stackAlaCarte.stack!.split("\n").slice(2).find(isInCWD) as any;
+    const file = atModule.exec(at)![1];
+    const ns = currentNamespace;
+    
+    if(setPrefix){
+      ns.module = file;
+      ns.prefix = setPrefix;
+    }
+    else if(ns.module == file)
+      return ns.prefix;
+  }
+  catch(err){}
+  }
+
+function scope(prefix: string, context: () => void){
+  routeStack.push(prefix);
+  context();
+  routeStack.pop();
+}
+
+function resource(verb: Verb){
   function register(loc: string, ...handlers: RequestHandler[]): any {
     const handle = definitionHandler(loc, verb);
 
@@ -56,11 +95,14 @@ export const POST = resource("post");
 export const PUT = resource("put");
 export const PATCH = resource("patch");
 export const DELETE = resource("delete");
+export const ROUTE = scope;
 export const USE = (...args: RequestHandler[]) => server.use(...args);
 
-export { setNewDefaultInstance as setDefault }
+export { setNewDefaultInstance as setDefault };
 export { exportedDefault as default, exportedDefault as API, exportedDefault };
+export { ROUTE as NEST };
+export { getNamespace as NAMESPACE };
 export { json, urlencoded } from "express";
-export { print } from "./print"
+export { print } from "./print";
 export * from "./errors";
 export * from "./gates";

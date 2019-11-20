@@ -113,8 +113,23 @@ export namespace DELETE {
   function test(dir: string, body?: {}, headers?: {}): void;
 }
 
+/**
+ * Declare a master route prefix for this module, or until another namespace is called.
+ * 
+ * @param prefix - Route which should prepend all other verb definitions in file.
+ */
+export function NAMESPACE(prefix: string): void;
+
+/**
+ * Declare a route prefix for all handlers declared within wrapper. 
+ * 
+ * @param route - Prefix you wish to apply to all handlers within wrapper.
+ * @param wrapper - Declare subroutes here, wrapper is run immediately.
+ */
+export function ROUTE(route: string, wrapper: () => void): void;
 export const USE: ApplicationRequestHandler<Express>; 
 
 export { API, API as server, API as default }
+export { ROUTE as NEST }
 export { json, urlencoded } from "express";
 export * from "./helpers"
