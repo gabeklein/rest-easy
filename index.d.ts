@@ -23,6 +23,20 @@ type HandleBody<I, O = void> = (
 
 declare const API: Express;
 
+interface DefinitionHandler<T, O> {
+  (fn: Handle<T, O>): void;
+  (m1: RequestHandler, fn: Handle<T, O>): void
+  (m1: RequestHandler, m2: RequestHandler, fn: Handle<T, O>): void
+  (m1: RequestHandler, m2: RequestHandler, m3: RequestHandler, fn: Handle<T, O>): void
+}
+
+interface DefinitionBodyHandler<T, O> {
+  (fn: HandleBody<T, O>): void;
+  (m1: RequestHandler, fn: HandleBody<T, O>): void
+  (m1: RequestHandler, m2: RequestHandler, fn: HandleBody<T, O>): void
+  (m1: RequestHandler, m2: RequestHandler, m3: RequestHandler, fn: HandleBody<T, O>): void
+}
+
 /**
  * Register a GET request with your exported App.
  * 
@@ -30,6 +44,7 @@ declare const API: Express;
  * @param m - Middleware (any Express RequestHandler)
  * @param fn - Handler
  */
+export function GET <T={}, O=any> (loc: string): DefinitionHandler<T, O>;
 export function GET <T={}, O=any> (loc: string, fn: Handle<T, O>): void
 export function GET <T={}, O=any> (loc: string, m1: RequestHandler, fn: Handle<T, O>): void
 export function GET <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, fn: Handle<T, O>): void
@@ -45,6 +60,7 @@ export namespace GET {
  * @param m - Middleware (any Express RequestHandler)
  * @param fn - Handler
  */
+export function POST <T={}, O=any> (loc: string): DefinitionBodyHandler<T, O>;
 export function POST <T={}, O=any> (loc: string, fn: HandleBody<T, O>): void
 export function POST <T={}, O=any> (loc: string, m1: RequestHandler, fn: HandleBody<T, O>): void
 export function POST <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, fn: HandleBody<T, O>): void
@@ -60,6 +76,7 @@ export namespace POST {
  * @param m - Middleware (any Express RequestHandler)
  * @param fn - Handler
  */
+export function PUT <T={}, O=any> (loc: string): DefinitionBodyHandler<T, O>;
 export function PUT <T={}, O=any> (loc: string, fn: HandleBody<T, O>): void
 export function PUT <T={}, O=any> (loc: string, m1: RequestHandler, fn: HandleBody<T, O>): void
 export function PUT <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, fn: HandleBody<T, O>): void
@@ -75,6 +92,7 @@ export namespace PUT {
  * @param m - Middleware (any Express RequestHandler)
  * @param fn - Handler
  */
+export function PATCH <T={}, O=any> (loc: string): DefinitionBodyHandler<T, O>;
 export function PATCH <T={}, O=any> (loc: string, fn: HandleBody<T, O>): void
 export function PATCH <T={}, O=any> (loc: string, m1: RequestHandler, fn: HandleBody<T, O>): void
 export function PATCH <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, fn: HandleBody<T, O>): void
@@ -89,6 +107,7 @@ export namespace PATCH {
  * @param loc - Resource url
  * @param fn - Request Handlers
  */
+export function DELETE (loc: string): DefinitionHandler<any, any>;
 export function DELETE (loc: string, ...fn: RequestHandler[]): void;
 export namespace DELETE {
   function test(dir: string, body?: {}, headers?: {}): void;

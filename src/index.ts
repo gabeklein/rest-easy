@@ -18,7 +18,6 @@ function finalizeThenListen(head: any, ...args: any){
     declareHost(`http://localhost:${head}`);
     console.log(`Listening on port ${head}`)
   }
-
 }
 
 function setNewDefaultInstance(instance?: Express){
@@ -26,14 +25,23 @@ function setNewDefaultInstance(instance?: Express){
   Object.setPrototypeOf(exportedDefault, server);
 }
 
-const resource = (verb: Verb) => {
-  function register(
-    loc: string, ...handlers: RequestHandler[]){
-
+function definitionHandler(loc: string, verb: Verb){
+  return (...handlers: RequestHandler[]) => {
     const main = handlers.pop();
     if(!main)
       throw new Error(`Endpoint ${loc} has no supplied handler!`);
     server[verb](loc, ...handlers, abstract(main))
+  }
+}
+
+const resource = (verb: Verb) => {
+  function register(loc: string, ...handlers: RequestHandler[]): any {
+    const handle = definitionHandler(loc, verb);
+
+    if(handlers.length > 0)
+      handle.apply(null, handlers)
+    else
+      return handle
   }
 
   register.test = testHandler(verb);
