@@ -21,7 +21,11 @@ type HandleBody<I, O = void> = (
   res: express.Response
 ) => O | Promise<O>;
 
-declare const API: Express;
+interface RestEasyApp {
+  declared: string[];
+}
+
+declare const API: Express & RestEasyApp;
 
 interface DefinitionHandler<T, O> {
   (fn: Handle<T, O>): void;

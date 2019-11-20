@@ -8,7 +8,8 @@ type Verb = "get" | "post" | "put" | "delete" | "patch";
 
 let server: Express;
 let exportedDefault = {
-  listen: finalizeThenListen
+  listen: finalizeThenListen,
+  declared: [] as string[]
 };
 
 function finalizeThenListen(head: any, ...args: any){
@@ -26,6 +27,13 @@ function setNewDefaultInstance(instance?: Express){
   Object.setPrototypeOf(exportedDefault, server);
 }
 
+function addRouteToList(verb: string, path: string) {
+  // const padding = Array(6 - verb.length + 1).join(" ");
+  verb = verb.toUpperCase();
+  const resource = `[${verb}] ${path}`;
+  exportedDefault.declared.push(resource);
+}
+
 const routeStack = [] as string[];
 let currentNamespace = {} as {
   module: string;
@@ -36,6 +44,8 @@ function definitionHandler(loc: string, verb: Verb){
   const namespace = getNamespace() || "";
   const path = join(namespace, ...routeStack, loc);
   
+  addRouteToList(verb, path)
+
   return (...handlers: RequestHandler[]) => {
     const main = handlers.pop();
     if(!main)
@@ -65,7 +75,7 @@ function getNamespace(setPrefix?: string): string | void {
       return ns.prefix;
   }
   catch(err){}
-  }
+}
 
 function scope(prefix: string, context: () => void){
   routeStack.push(prefix);
