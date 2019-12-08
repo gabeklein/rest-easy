@@ -37,12 +37,21 @@ export function abstract(handler: RequestHandler): RequestHandler {
       if(response.headersSent)
         return
 
-      if(content === undefined)
-        content = { ok: true };
-      else if(typeof content !== "object")
-        content = { response: content };
+      response.status(status)
       
-      response.status(status).json(content)
+      if(!content)
+        return
+
+      if(typeof content == "object"
+      && content.toString !== Object.prototype.toString
+      && content.toString !== Array.prototype.toString)
+        content = content.toString();
+        
+      else if(typeof content !== "object"){
+        content = { response: content };
+      }
+      
+      response.send(content)
     }
   }
 }
