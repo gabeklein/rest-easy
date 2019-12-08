@@ -1,5 +1,5 @@
 import { join } from "path";
-import express, { Express, RequestHandler } from 'express';
+import express, { Express, RequestHandler, Request, Response } from 'express';
 
 import { abstract, handle404 } from './abstract';
 import { testHandler, declareHost } from './test';
@@ -84,6 +84,41 @@ function scope(prefix: string, context: () => void){
   routeStack.pop();
 }
 
+type Wrapper = (
+  returned: any, 
+  request: Request, 
+  response: Response
+) => any;
+
+function extendHandler(verb: Verb){
+  return (
+    middleware: RequestHandler[] = [], 
+    wrap?: Wrapper) => {    
+
+    return (loc: string) => {
+      const namespace = getNamespace() || "";
+      const path = join(namespace, ...routeStack, loc);
+
+      return (handler: RequestHandler) => {
+        addRouteToList(verb, path);
+  
+        if(wrap){
+          const original = handler;
+          handler = async (req: any, res: any, next: any) => {
+            let result = original(req, res, next);
+            if(result instanceof Promise)
+              result = await result;
+  
+            return wrap(result, req, res);
+          }
+        }
+  
+        server[verb](path, ...middleware, abstract(handler))
+      }
+    }
+  }
+}
+
 function resource(verb: Verb){
   function register(loc: string, ...handlers: RequestHandler[]): any {
     const handle = definitionHandler(loc, verb);
@@ -95,6 +130,7 @@ function resource(verb: Verb){
   }
 
   register.test = testHandler(verb);
+  register.extend = extendHandler(verb);
   
   return register;
 }

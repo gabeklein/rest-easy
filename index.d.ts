@@ -21,6 +21,17 @@ type HandleBody<I, O = void> = (
   res: express.Response
 ) => O | Promise<O>;
 
+type HandleSpecial<I, O = void> = (
+  input: I,
+  req: express.Request,
+  res: express.Response
+ ) => O | Promise<O>;
+
+interface SpecialRegister<H, O> {
+  <T>(dir: string, fn: H): void;
+  <T>(dir: string): (fn: H) => void
+}
+
 interface RestEasyApp {
   declared: string[];
 }
@@ -55,6 +66,19 @@ export function GET <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestH
 export function GET <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, m3: RequestHandler, fn: Handle<T, O>): void
 export namespace GET {
   function test(dir: string, query?: {}, headers?: {}): void;
+
+  function extend(
+    middleware: RequestHandler[]
+  ): <T>(dir: string, handler: Handle<T>) => void;
+
+  function extend<O = any, I = any>(
+    middleware: RequestHandler[], 
+    wrap?: (
+      result: O,
+      request: express.Request, 
+      response: express.Response
+    ) => any
+  ): <T = I>(dir: string) => (handle: Handle<T, O>) => void;
 }
 
 /**
@@ -71,6 +95,19 @@ export function POST <T={}, O=any> (loc: string, m1: RequestHandler, m2: Request
 export function POST <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, m3: RequestHandler, fn: HandleBody<T, O>): void
 export namespace POST {
   function test(dir: string, body?: {}, headers?: {}): void;
+
+  function extend(
+    middleware: RequestHandler[]
+  ): <T>(dir: string, handler: HandleBody<T>) => void;
+
+  function extend<O = any, I = any>(
+    middleware: RequestHandler[], 
+    wrap?: (
+      result: O,
+      request: express.Request, 
+      response: express.Response
+    ) => any
+  ): <T = I>(dir: string) => (handle: HandleBody<T, O>) => void;
 }
 
 /**
