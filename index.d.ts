@@ -1,157 +1,72 @@
-import express, { RequestHandler, Express } from 'express';
+import express, { RequestHandler as Handler, Express, Request, Response } from 'express';
 import { ApplicationRequestHandler } from 'express-serve-static-core';
 
-interface Request<T> 
-  extends express.Request {
+interface QueryRequest<T> extends Request {
   query: T
 }
 
-interface RequestWithBody<T> 
-  extends express.Request {
-  body: T
+interface BodiedRequest<B, Q = any> extends Request {
+  body: B
+  query: Q
 }
 
-type Handle<I, O = void> = (
-  req: Request<I>,
-  res: express.Response
-) => O | Promise<O>;
+type Middleware = Handler[];
 
-type HandleBody<I, O = void> = (
-  req: RequestWithBody<I>,
-  res: express.Response
-) => O | Promise<O>;
+type HandleQuery<I, O = unknown> =   (req: QueryRequest<I>,     res: Response) => O | Promise<O>;
+type HandleBody<B, Q, O = unknown> = (req: BodiedRequest<B, Q>, res: Response) => O | Promise<O>;
 
-type HandleSpecial<I, O = void> = (
-  input: I,
-  req: express.Request,
-  res: express.Response
- ) => O | Promise<O>;
+type HandleSpecial<I, O = void> = (input: I, req: Request, res: Response) => O | Promise<O>;
+
+type ResultGetter<T> = (result: T, request: Request, response: Response) => any;
+
+interface DefaultApp {
+  declared: string[];
+}
 
 interface SpecialRegister<H, O> {
   <T>(dir: string, fn: H): void;
   <T>(dir: string): (fn: H) => void
 }
 
-interface RestEasyApp {
-  declared: string[];
+interface DefinitionHandler<H> {
+  (fn: H): void;
+  (m1: Handler, fn: H): void
+  (m1: Handler, m2: Handler, fn: H): void
+  (m1: Handler, m2: Handler, m3: Handler, fn: H): void
 }
 
-declare const API: Express & RestEasyApp;
-
-interface DefinitionHandler<T, O> {
-  (fn: Handle<T, O>): void;
-  (m1: RequestHandler, fn: Handle<T, O>): void
-  (m1: RequestHandler, m2: RequestHandler, fn: Handle<T, O>): void
-  (m1: RequestHandler, m2: RequestHandler, m3: RequestHandler, fn: Handle<T, O>): void
+interface VERB {
+  test(dir: string, query?: {}, headers?: {}): void;
 }
 
-interface DefinitionBodyHandler<T, O> {
-  (fn: HandleBody<T, O>): void;
-  (m1: RequestHandler, fn: HandleBody<T, O>): void
-  (m1: RequestHandler, m2: RequestHandler, fn: HandleBody<T, O>): void
-  (m1: RequestHandler, m2: RequestHandler, m3: RequestHandler, fn: HandleBody<T, O>): void
+interface CUSTOM_QUERY<I = any, O = any> {
+  <T = I>(dir: string, handle: HandleQuery<T, O>): void
+  <T = I>(dir: string): (handle: HandleQuery<T, O>) => void
 }
 
-/**
- * Register a GET request with your exported App.
- * 
- * @param loc - Resource url
- * @param m - Middleware (any Express RequestHandler)
- * @param fn - Handler
- */
-export function GET <T={}, O=any> (loc: string): DefinitionHandler<T, O>;
-export function GET <T={}, O=any> (loc: string, fn: Handle<T, O>): void
-export function GET <T={}, O=any> (loc: string, m1: RequestHandler, fn: Handle<T, O>): void
-export function GET <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, fn: Handle<T, O>): void
-export function GET <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, m3: RequestHandler, fn: Handle<T, O>): void
-export namespace GET {
-  function test(dir: string, query?: {}, headers?: {}): void;
-
-  function extend(
-    middleware: RequestHandler[]
-  ): <T>(dir: string, handler: Handle<T>) => void;
-
-  function extend<O = any, I = any>(
-    middleware: RequestHandler[], 
-    wrap?: (
-      result: O,
-      request: express.Request, 
-      response: express.Response
-    ) => any
-  ): <T = I>(dir: string) => (handle: Handle<T, O>) => void;
+interface CUSTOM_BODY<I = any, O = any> {
+  <T = I>(dir: string, handle: HandleBody<T, O>): void
+  <T = I>(dir: string): (handle: HandleBody<T, O>) => void
 }
 
-/**
- * Register a POST request with your exported App.
- * 
- * @param loc - Resource url
- * @param m - Middleware (any Express RequestHandler)
- * @param fn - Handler
- */
-export function POST <T={}, O=any> (loc: string): DefinitionBodyHandler<T, O>;
-export function POST <T={}, O=any> (loc: string, fn: HandleBody<T, O>): void
-export function POST <T={}, O=any> (loc: string, m1: RequestHandler, fn: HandleBody<T, O>): void
-export function POST <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, fn: HandleBody<T, O>): void
-export function POST <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, m3: RequestHandler, fn: HandleBody<T, O>): void
-export namespace POST {
-  function test(dir: string, body?: {}, headers?: {}): void;
+interface TYPED_QUERY<T2 = any> extends VERB {
+  <T, O = unknown>(loc: string): DefinitionHandler<HandleQuery<T, O>>;
+  <T, O = unknown>(loc: string, fn: HandleQuery<T, O>): void
+  <T, O = unknown>(loc: string, m1: Handler, fn: HandleQuery<T, O>): void
+  <T, O = unknown>(loc: string, m1: Handler, m2: Handler, fn: HandleQuery<T, O>): void
+  <T, O = unknown>(loc: string, m1: Handler, m2: Handler, m3: Handler, fn: HandleQuery<T, O>): void
 
-  function extend(
-    middleware: RequestHandler[]
-  ): <T>(dir: string, handler: HandleBody<T>) => void;
-
-  function extend<O = any, I = any>(
-    middleware: RequestHandler[], 
-    wrap?: (
-      result: O,
-      request: express.Request, 
-      response: express.Response
-    ) => any
-  ): <T = I>(dir: string) => (handle: HandleBody<T, O>) => void;
+  extend<T>(middleware: Handler[]): CUSTOM_QUERY<T>;
 }
 
-/**
- * Register a PUT request with your exported App.
- * 
- * @param loc - Resource url
- * @param m - Middleware (any Express RequestHandler)
- * @param fn - Handler
- */
-export function PUT <T={}, O=any> (loc: string): DefinitionBodyHandler<T, O>;
-export function PUT <T={}, O=any> (loc: string, fn: HandleBody<T, O>): void
-export function PUT <T={}, O=any> (loc: string, m1: RequestHandler, fn: HandleBody<T, O>): void
-export function PUT <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, fn: HandleBody<T, O>): void
-export function PUT <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, m3: RequestHandler, fn: HandleBody<T, O>): void
-export namespace PUT {
-  function test(dir: string, body?: {}, headers?: {}): void;
-}
+interface TYPED_BODY<T2 = any> extends VERB {
+  <T, O = unknown>(loc: string): DefinitionHandler<HandleBody<T, O>>;
+  <T, O = unknown>(loc: string, fn: HandleBody<T, O>): void
+  <T, O = unknown>(loc: string, m1: Handler, fn: HandleBody<T, O>): void
+  <T, O = unknown>(loc: string, m1: Handler, m2: Handler, fn: HandleBody<T, O>): void
+  <T, O = unknown>(loc: string, m1: Handler, m2: Handler, m3: Handler, fn: HandleBody<T, O>): void
 
-/**
- * Register a PATCH request with your exported App.
- * 
- * @param loc - Resource url
- * @param m - Middleware (any Express RequestHandler)
- * @param fn - Handler
- */
-export function PATCH <T={}, O=any> (loc: string): DefinitionBodyHandler<T, O>;
-export function PATCH <T={}, O=any> (loc: string, fn: HandleBody<T, O>): void
-export function PATCH <T={}, O=any> (loc: string, m1: RequestHandler, fn: HandleBody<T, O>): void
-export function PATCH <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, fn: HandleBody<T, O>): void
-export function PATCH <T={}, O=any> (loc: string, m1: RequestHandler, m2: RequestHandler, m3: RequestHandler, fn: HandleBody<T, O>): void
-export namespace PATCH {
-  function test(dir: string, body?: {}, headers?: {}): void;
-}
-
-/**
- * Register a DELETE request with your exported App.
- * 
- * @param loc - Resource url
- * @param fn - Request Handlers
- */
-export function DELETE (loc: string): DefinitionHandler<any, any>;
-export function DELETE (loc: string, ...fn: RequestHandler[]): void;
-export namespace DELETE {
-  function test(dir: string, body?: {}, headers?: {}): void;
+  extend<T>(middleware: Handler[]): CUSTOM_BODY<T>;
 }
 
 /**
@@ -161,6 +76,19 @@ export namespace DELETE {
  */
 export function NAMESPACE(prefix: string): void;
 
+declare const API: Express & DefaultApp;
+
+/** Register a GET request with your App. */
+declare const GET: TYPED_QUERY;
+/** Register a POST request with your App. */
+declare const POST: TYPED_BODY;
+/** Register a PUT request with your App. */
+declare const PUT: TYPED_BODY;
+/** Register a PATCH request with your exported App. */
+declare const PATCH: TYPED_BODY;
+/** Register a DELETE request with your exported App. */
+declare const DELETE: TYPED_QUERY;
+
 /**
  * Declare a route prefix for all handlers declared within wrapper. 
  * 
@@ -168,8 +96,10 @@ export function NAMESPACE(prefix: string): void;
  * @param wrapper - Declare subroutes here, wrapper is run immediately.
  */
 export function ROUTE(route: string, wrapper: () => void): void;
+
 export const USE: ApplicationRequestHandler<Express>; 
 
+export { GET, POST, PUT, PATCH, DELETE }
 export { API, API as server, API as default }
 export { ROUTE as NEST }
 export { json, urlencoded } from "express";
