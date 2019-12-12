@@ -40,7 +40,7 @@ export function abstract(handler: RequestHandler): RequestHandler {
       response.status(status)
       
       if(!content)
-        return
+        response.json({ ok: true });
 
       if(typeof content == "object"
       && content.toString !== Object.prototype.toString
