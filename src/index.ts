@@ -55,9 +55,8 @@ function definitionHandler(loc: string, verb: Verb){
 }
 
 const atModule = /\s+at.+\((.+):\d+:\d/;
-const cwd = process.cwd();
 const isInWorkingDirectory = 
-  (d: string) => d.indexOf("node_modules") < 0 && d.indexOf(cwd) >= 0;
+  (d: string) => d.indexOf("node_modules") < 0 && d.indexOf("internal/modules/cjs") < 0
 
 function getNamespace(): string | void;
 function getNamespace(setPrefix: string): void; 
