@@ -54,20 +54,42 @@ function definitionHandler(loc: string, verb: Verb){
   }
 }
 
-const atModule = /\s+at.+\((.+):\d+:\d/;
-const isInWorkingDirectory = 
-  (d: string) => d.indexOf("node_modules") < 0 && d.indexOf("internal/modules/cjs") < 0
+const stacktraces = /at +(.+):\d+:\d+\)/;
+const verb = /\[as [A-Z]+\]/;
 
 function getNamespace(): string | void;
 function getNamespace(setPrefix: string): void; 
 function getNamespace(setPrefix?: string): string | void {
-  const stackAlaCarte = new Error();
+  let file = "";
+  const fn = __filename;
+  const ns = currentNamespace;
+
   try {
-    const at = stackAlaCarte.stack!.split("\n").slice(2).find(isInWorkingDirectory) as any;
-    const file = atModule.exec(at)![1];
-    const ns = currentNamespace;
+    let found = false;
+    const stack = new Error()
+      .stack!
+      .split("\n")
+      .slice(1)
+      .map(x => stacktraces
+        .exec(x)![1]
+        .split(" (")
+      );
+
+    for(const [func, f] of stack){
+      if(found){
+        file = f;
+        break;
+      }
+
+      if(func.match(verb) && f == fn){
+        found = true;
+      }
+    }
+
+    if(!file && (ns.prefix || setPrefix))
+      throw new Error("Could not determine file resource was defined in!")
     
-    if(setPrefix){
+    if(typeof setPrefix == "string"){
       ns.module = file;
       ns.prefix = setPrefix;
     }
