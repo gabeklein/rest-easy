@@ -30,8 +30,7 @@ function setNewDefaultInstance(instance?: Express){
 function addRouteToList(verb: string, path: string) {
   // const padding = Array(6 - verb.length + 1).join(" ");
   verb = verb.toUpperCase();
-  const resource = `[${verb}] ${path}`;
-  exportedDefault.declared.push(resource);
+  exportedDefault.declared.push(`[${verb}] ${path}`);
 }
 
 const routeStack = [] as string[];
@@ -40,16 +39,34 @@ let currentNamespace = {} as {
   prefix: string;
 };
 
+function callHandler(verb: Verb){
+  return (loc: string, handler: Function) => {
+    const namespace = getNamespace() || "";
+    const path = join(namespace, ...routeStack, loc);
+
+    addRouteToList(verb, path)
+  
+    if(!handler)
+      throw new Error(`Resource ${path} has no supplied handler!`);
+  
+    let wrapper = verb == "get"
+      ? (req: Request) => handler(req.query) 
+      : (req: Request) => handler(req.body)
+  
+    server[verb](path, abstract(wrapper as any))
+  }
+}
+
 function definitionHandler(loc: string, verb: Verb){
   const namespace = getNamespace() || "";
   const path = join(namespace, ...routeStack, loc);
   
-  addRouteToList(verb, path)
-
   return (...handlers: RequestHandler[]) => {
     const main = handlers.pop();
     if(!main)
       throw new Error(`Resource ${path} has no supplied handler!`);
+
+    addRouteToList(verb, path)
     server[verb](path, ...handlers, abstract(main))
   }
 }
@@ -81,9 +98,8 @@ function getNamespace(setPrefix?: string): string | void {
         break;
       }
 
-      if(func.match(verb) && f == fn){
+      if(func.match(verb) || func.indexOf("Function.apply") >= 0 && f == fn)
         found = true;
-      }
     }
 
     if(!file && (ns.prefix || setPrefix))
@@ -152,6 +168,7 @@ function resource(verb: Verb){
 
   register.test = testHandler(verb);
   register.extend = extendHandler(verb);
+  register.apply = callHandler(verb);
   
   return register;
 }

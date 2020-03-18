@@ -57,6 +57,7 @@ interface TYPED_QUERY<T2 = any> extends VERB {
   <T, O = unknown>(loc: string, m1: Handler, m2: Handler, m3: Handler, fn: HandleQuery<T, O>): void
 
   extend<T>(middleware: Handler[]): CUSTOM_QUERY<T>;
+  apply(loc: string, handler: Function): void;
 }
 
 interface TYPED_BODY<T2 = any> extends VERB {
@@ -67,6 +68,7 @@ interface TYPED_BODY<T2 = any> extends VERB {
   <T, O = unknown>(loc: string, m1: Handler, m2: Handler, m3: Handler, fn: HandleBody<T, O>): void
 
   extend<T>(middleware: Handler[]): CUSTOM_BODY<T>;
+  apply(loc: string, handler: Function): void;
 }
 
 /**
